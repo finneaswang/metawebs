@@ -3,7 +3,8 @@ import time
 from typing import Dict, Any
 
 from fastapi import Body, FastAPI, HTTPException, Request
-from fastapi.responses import HTMLResponse
+from fastapi.responses import HTMLResponse, JSONResponse
+from fastapi.middleware.cors import CORSMiddleware
 
 from app.openrouter_demo import ask_model
 from app.model_config import (
@@ -15,6 +16,15 @@ from app.model_config import (
 )
 
 app = FastAPI(title="AI模型管理系统")
+
+# 添加CORS中间件
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 
 AVAILABLE_MODELS = [
     {"id": "openai/gpt-4o-mini", "name": "GPT-4o Mini", "provider": "OpenAI"},
@@ -58,8 +68,23 @@ async def log_requests(request: Request, call_next):
 @app.get("/", response_class=HTMLResponse)
 async def index():
     """首页 - AI管理中心"""
-    with open("/Volumes/Additional/Metaweb/index.html", "r", encoding="utf-8") as f:
-        return HTMLResponse(content=f.read())
+    try:
+        import os
+        file_path = os.path.join(os.path.dirname(os.path.dirname(__file__)), "index.html")
+        with open(file_path, "r", encoding="utf-8") as f:
+            return HTMLResponse(content=f.read())
+    except Exception as e:
+        return HTMLResponse(content=f"""
+        <html>
+        <body>
+        <h1>🤖 Metaweb AI 管理系统</h1>
+        <p>系统正在启动中...</p>
+        <p>错误: {str(e)}</p>
+        <p><a href="/healthz">健康检查</a></p>
+        <p><a href="/docs">API文档</a></p>
+        </body>
+        </html>
+        """)
 
 
 @app.get("/healthz")
@@ -135,21 +160,27 @@ def serialize_active_config() -> Dict[str, Any]:
 @app.get("/admin/model-config", response_class=HTMLResponse)
 async def model_config_page():
     """AI模型配置管理页面"""
-    with open("/Volumes/Additional/Metaweb/app/model_config_page.html", "r", encoding="utf-8") as f:
+    import os
+    file_path = os.path.join(os.path.dirname(__file__), "model_config_page.html")
+    with open(file_path, "r", encoding="utf-8") as f:
         return HTMLResponse(content=f.read())
 
 
 @app.get("/test", response_class=HTMLResponse)
 async def test_page():
     """测试页面"""
-    with open("/Volumes/Additional/Metaweb/app/test_page.html", "r", encoding="utf-8") as f:
+    import os
+    file_path = os.path.join(os.path.dirname(__file__), "test_page.html")
+    with open(file_path, "r", encoding="utf-8") as f:
         return HTMLResponse(content=f.read())
 
 
 @app.get("/setup", response_class=HTMLResponse)
 async def setup_guide():
     """Open WebUI 设置引导页面"""
-    with open("/Volumes/Additional/Metaweb/onboarding.html", "r", encoding="utf-8") as f:
+    import os
+    file_path = os.path.join(os.path.dirname(os.path.dirname(__file__)), "onboarding.html")
+    with open(file_path, "r", encoding="utf-8") as f:
         return HTMLResponse(content=f.read())
 
 
