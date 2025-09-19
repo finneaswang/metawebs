@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>测试页面</title>
+</head>
+<body>
+    <div id="app">
+        <h1>🤖 AI模型配置管理 - 测试页面</h1>
+        <p>如果你能看到这个页面，说明路由工作正常。</p>
+        <div id="test-result"></div>
+    </div>
+
+    <script>
+        // 测试API连接
+        async function testAPI() {
+            try {
+                const response = await fetch('/config/active');
+                const data = await response.json();
+                document.getElementById('test-result').innerHTML = `
+                    <h3>✅ API连接测试成功</h3>
+                    <pre>${JSON.stringify(data, null, 2)}</pre>
+                `;
+            } catch (error) {
+                document.getElementById('test-result').innerHTML = `
+                    <h3>❌ API连接测试失败</h3>
+                    <p>错误: ${error.message}</p>
+                `;
+            }
+        }
+        
+        // 页面加载后测试API
+        window.onload = testAPI;
+    </script>
+</body>
+</html>

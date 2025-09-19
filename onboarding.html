@@ -1,0 +1,562 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Open WebUI 设置向导</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .wizard-container {
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.1);
+            width: 90%;
+            max-width: 800px;
+            overflow: hidden;
+        }
+        
+        .wizard-header {
+            background: linear-gradient(135deg, #2563eb, #3b82f6);
+            color: white;
+            padding: 40px;
+            text-align: center;
+        }
+        
+        .wizard-header h1 {
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+        }
+        
+        .wizard-header p {
+            font-size: 1.1rem;
+            opacity: 0.9;
+        }
+        
+        .wizard-content {
+            padding: 40px;
+        }
+        
+        .step {
+            display: none;
+            animation: fadeIn 0.5s ease-in;
+        }
+        
+        .step.active {
+            display: block;
+        }
+        
+        .step h2 {
+            color: #1f2937;
+            margin-bottom: 20px;
+            font-size: 1.8rem;
+        }
+        
+        .step-content {
+            margin-bottom: 30px;
+        }
+        
+        .status-check {
+            background: #f8fafc;
+            border: 1px solid #e2e8f0;
+            border-radius: 12px;
+            padding: 20px;
+            margin: 20px 0;
+        }
+        
+        .status-item {
+            display: flex;
+            align-items: center;
+            margin: 10px 0;
+            font-size: 1.1rem;
+        }
+        
+        .status-icon {
+            width: 24px;
+            height: 24px;
+            margin-right: 12px;
+            font-size: 1.2rem;
+        }
+        
+        .api-key-form {
+            background: #f8fafc;
+            border-radius: 12px;
+            padding: 25px;
+            margin: 20px 0;
+        }
+        
+        .form-group {
+            margin-bottom: 20px;
+        }
+        
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: #374151;
+        }
+        
+        .form-group input {
+            width: 100%;
+            padding: 12px 16px;
+            border: 2px solid #e5e7eb;
+            border-radius: 8px;
+            font-size: 1rem;
+            transition: border-color 0.2s;
+        }
+        
+        .form-group input:focus {
+            outline: none;
+            border-color: #2563eb;
+        }
+        
+        .form-group small {
+            color: #6b7280;
+            font-size: 0.9rem;
+            margin-top: 5px;
+            display: block;
+        }
+        
+        .button-group {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: 30px;
+        }
+        
+        .btn {
+            padding: 12px 24px;
+            border: none;
+            border-radius: 8px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+            text-decoration: none;
+            display: inline-block;
+            text-align: center;
+        }
+        
+        .btn-primary {
+            background: #2563eb;
+            color: white;
+        }
+        
+        .btn-primary:hover {
+            background: #1d4ed8;
+        }
+        
+        .btn-secondary {
+            background: #6b7280;
+            color: white;
+        }
+        
+        .btn-secondary:hover {
+            background: #4b5563;
+        }
+        
+        .btn-success {
+            background: #10b981;
+            color: white;
+        }
+        
+        .btn-success:hover {
+            background: #059669;
+        }
+        
+        .progress-bar {
+            width: 100%;
+            height: 6px;
+            background: #e5e7eb;
+            border-radius: 3px;
+            margin-bottom: 30px;
+            overflow: hidden;
+        }
+        
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #2563eb, #3b82f6);
+            border-radius: 3px;
+            transition: width 0.5s ease;
+        }
+        
+        .feature-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin: 20px 0;
+        }
+        
+        .feature-card {
+            background: #f8fafc;
+            border: 1px solid #e2e8f0;
+            border-radius: 12px;
+            padding: 20px;
+            text-align: center;
+        }
+        
+        .feature-icon {
+            font-size: 2rem;
+            margin-bottom: 10px;
+        }
+        
+        .tips-list {
+            background: #fef3c7;
+            border: 1px solid #f59e0b;
+            border-radius: 12px;
+            padding: 20px;
+            margin: 20px 0;
+        }
+        
+        .tips-list h3 {
+            color: #92400e;
+            margin-bottom: 15px;
+        }
+        
+        .tips-list ul {
+            list-style: none;
+            padding: 0;
+        }
+        
+        .tips-list li {
+            margin: 8px 0;
+            padding-left: 20px;
+            position: relative;
+        }
+        
+        .tips-list li:before {
+            content: "💡";
+            position: absolute;
+            left: 0;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        .loading {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 2px solid #f3f3f3;
+            border-top: 2px solid #2563eb;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+    </style>
+</head>
+<body>
+    <div class="wizard-container">
+        <div class="wizard-header">
+            <h1>🚀 Open WebUI</h1>
+            <p>欢迎使用AI聊天界面！让我们开始设置之旅</p>
+        </div>
+        
+        <div class="wizard-content">
+            <div class="progress-bar">
+                <div class="progress-fill" id="progressFill" style="width: 20%"></div>
+            </div>
+            
+            <!-- 步骤 1: 欢迎 -->
+            <div class="step active" id="step1">
+                <h2>👋 欢迎使用 Open WebUI</h2>
+                <div class="step-content">
+                    <p style="font-size: 1.1rem; line-height: 1.6; color: #4b5563;">
+                        Open WebUI 是一个现代化的AI聊天界面，支持多种AI模型。让我们花几分钟时间来设置你的专属AI助手。
+                    </p>
+                    
+                    <div class="feature-grid">
+                        <div class="feature-card">
+                            <div class="feature-icon">🤖</div>
+                            <h3>多模型支持</h3>
+                            <p>GPT-4, Claude, Mistral等</p>
+                        </div>
+                        <div class="feature-card">
+                            <div class="feature-icon">⚙️</div>
+                            <h3>参数调节</h3>
+                            <p>温度、长度、提示词</p>
+                        </div>
+                        <div class="feature-card">
+                            <div class="feature-icon">💬</div>
+                            <h3>聊天管理</h3>
+                            <p>历史记录、导出功能</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="button-group">
+                    <div></div>
+                    <button class="btn btn-primary" onclick="nextStep()">开始设置 →</button>
+                </div>
+            </div>
+            
+            <!-- 步骤 2: 检查服务状态 -->
+            <div class="step" id="step2">
+                <h2>🔍 检查服务状态</h2>
+                <div class="step-content">
+                    <p>让我们检查 Open WebUI 服务是否正常运行...</p>
+                    
+                    <div class="status-check">
+                        <div class="status-item" id="serviceStatus">
+                            <div class="loading"></div>
+                            <span>检查服务状态...</span>
+                        </div>
+                        <div class="status-item" id="portStatus">
+                            <span class="status-icon">⏳</span>
+                            <span>检查端口访问...</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="button-group">
+                    <button class="btn btn-secondary" onclick="prevStep()">← 返回</button>
+                    <button class="btn btn-primary" id="step2Next" onclick="nextStep()" disabled>下一步 →</button>
+                </div>
+            </div>
+            
+            <!-- 步骤 3: API密钥设置 -->
+            <div class="step" id="step3">
+                <h2>🔑 设置 API 密钥</h2>
+                <div class="step-content">
+                    <p>为了使用AI功能，你需要设置至少一个API密钥：</p>
+                    
+                    <div class="api-key-form">
+                        <div class="form-group">
+                            <label for="openrouterKey">OpenRouter API 密钥 (推荐)</label>
+                            <input type="password" id="openrouterKey" placeholder="输入你的 OpenRouter API 密钥">
+                            <small>支持多种模型，获取密钥: <a href="https://openrouter.ai/keys" target="_blank">https://openrouter.ai/keys</a></small>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="openaiKey">OpenAI API 密钥</label>
+                            <input type="password" id="openaiKey" placeholder="输入你的 OpenAI API 密钥">
+                            <small>官方GPT模型，获取密钥: <a href="https://platform.openai.com/api-keys" target="_blank">https://platform.openai.com/api-keys</a></small>
+                        </div>
+                        
+                        <button class="btn btn-primary" onclick="testApiKeys()" id="testKeysBtn">
+                            <span id="testKeysText">测试密钥</span>
+                        </button>
+                        
+                        <div id="keyTestResult" style="margin-top: 15px;"></div>
+                    </div>
+                </div>
+                
+                <div class="button-group">
+                    <button class="btn btn-secondary" onclick="prevStep()">← 返回</button>
+                    <button class="btn btn-primary" onclick="nextStep()">稍后设置 →</button>
+                </div>
+            </div>
+            
+            <!-- 步骤 4: 使用指南 -->
+            <div class="step" id="step4">
+                <h2>📚 使用指南</h2>
+                <div class="step-content">
+                    <p>以下是一些使用技巧，帮你快速上手：</p>
+                    
+                    <div class="tips-list">
+                        <h3>💡 快速上手技巧</h3>
+                        <ul>
+                            <li>点击右上角 ⚙️ 图标进入设置</li>
+                            <li>在"连接"选项卡中可以配置API密钥</li>
+                            <li>选择不同的AI模型体验不同风格</li>
+                            <li>调整Temperature控制回复的创造性</li>
+                            <li>使用System Prompt定制AI角色</li>
+                            <li>左侧面板可查看聊天历史</li>
+                            <li>支持深色模式和多种主题</li>
+                        </ul>
+                    </div>
+                    
+                    <div class="feature-grid">
+                        <div class="feature-card">
+                            <div class="feature-icon">🎨</div>
+                            <h3>个性化设置</h3>
+                            <p>主题、语言、界面布局</p>
+                        </div>
+                        <div class="feature-card">
+                            <div class="feature-icon">📤</div>
+                            <h3>导出功能</h3>
+                            <p>保存重要对话内容</p>
+                        </div>
+                        <div class="feature-card">
+                            <div class="feature-icon">🔌</div>
+                            <h3>扩展功能</h3>
+                            <p>插件、工具集成</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="button-group">
+                    <button class="btn btn-secondary" onclick="prevStep()">← 返回</button>
+                    <button class="btn btn-success" onclick="finishSetup()">开始使用 🚀</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let currentStep = 1;
+        const totalSteps = 4;
+
+        function updateProgress() {
+            const progress = (currentStep / totalSteps) * 100;
+            document.getElementById('progressFill').style.width = progress + '%';
+        }
+
+        function showStep(step) {
+            // 隐藏所有步骤
+            document.querySelectorAll('.step').forEach(s => s.classList.remove('active'));
+            
+            // 显示当前步骤
+            document.getElementById(`step${step}`).classList.add('active');
+            
+            // 更新进度条
+            updateProgress();
+            
+            // 特殊处理
+            if (step === 2) {
+                checkServiceStatus();
+            }
+        }
+
+        function nextStep() {
+            if (currentStep < totalSteps) {
+                currentStep++;
+                showStep(currentStep);
+            }
+        }
+
+        function prevStep() {
+            if (currentStep > 1) {
+                currentStep--;
+                showStep(currentStep);
+            }
+        }
+
+        async function checkServiceStatus() {
+            const serviceStatus = document.getElementById('serviceStatus');
+            const portStatus = document.getElementById('portStatus');
+            const nextBtn = document.getElementById('step2Next');
+            
+            try {
+                // 检查端口3001
+                const response = await fetch('http://localhost:3001', { 
+                    method: 'HEAD',
+                    mode: 'no-cors'
+                });
+                
+                serviceStatus.innerHTML = '<span class="status-icon">✅</span><span>Open WebUI 服务正常运行</span>';
+                portStatus.innerHTML = '<span class="status-icon">✅</span><span>端口 3001 可访问</span>';
+                nextBtn.disabled = false;
+                
+            } catch (error) {
+                serviceStatus.innerHTML = '<span class="status-icon">❌</span><span>服务可能未启动</span>';
+                portStatus.innerHTML = '<span class="status-icon">❌</span><span>端口 3001 无法访问</span>';
+                
+                // 显示解决方案
+                const statusCheck = document.querySelector('.status-check');
+                statusCheck.innerHTML += `
+                    <div style="margin-top: 20px; padding: 15px; background: #fee2e2; border-radius: 8px; border: 1px solid #fecaca;">
+                        <h4 style="color: #991b1b; margin-bottom: 10px;">🚨 需要启动服务</h4>
+                        <p style="color: #991b1b; margin-bottom: 10px;">请在终端运行以下命令启动 Open WebUI:</p>
+                        <code style="background: #1f2937; color: #f9fafb; padding: 8px 12px; border-radius: 4px; display: block;">
+                            python3 deploy_openwebui.py
+                        </code>
+                        <p style="color: #991b1b; margin-top: 10px; font-size: 0.9rem;">启动后刷新此页面继续设置</p>
+                    </div>
+                `;
+                
+                // 添加刷新按钮
+                nextBtn.textContent = '刷新检查';
+                nextBtn.disabled = false;
+                nextBtn.onclick = () => {
+                    location.reload();
+                };
+            }
+        }
+
+        async function testApiKeys() {
+            const openrouterKey = document.getElementById('openrouterKey').value.trim();
+            const openaiKey = document.getElementById('openaiKey').value.trim();
+            const testBtn = document.getElementById('testKeysBtn');
+            const testText = document.getElementById('testKeysText');
+            const result = document.getElementById('keyTestResult');
+            
+            if (!openrouterKey && !openaiKey) {
+                result.innerHTML = '<div style="color: #f59e0b;">⚠️ 请至少输入一个API密钥</div>';
+                return;
+            }
+            
+            testBtn.disabled = true;
+            testText.innerHTML = '<div class="loading" style="width: 16px; height: 16px; margin-right: 8px;"></div>测试中...';
+            
+            // 模拟API测试（实际应用中需要后端验证）
+            setTimeout(() => {
+                let resultHtml = '<div style="color: #10b981;">✅ 密钥设置成功！</div>';
+                
+                if (openrouterKey) {
+                    resultHtml += '<div style="color: #6b7280; font-size: 0.9rem; margin-top: 5px;">OpenRouter 密钥已配置</div>';
+                }
+                if (openaiKey) {
+                    resultHtml += '<div style="color: #6b7280; font-size: 0.9rem; margin-top: 5px;">OpenAI 密钥已配置</div>';
+                }
+                
+                result.innerHTML = resultHtml;
+                testBtn.disabled = false;
+                testText.textContent = '重新测试';
+                
+                // 保存到localStorage（实际应用中应该发送到后端）
+                if (openrouterKey) localStorage.setItem('openrouter_key', openrouterKey);
+                if (openaiKey) localStorage.setItem('openai_key', openaiKey);
+                
+            }, 2000);
+        }
+
+        function finishSetup() {
+            // 打开Open WebUI
+            window.open('http://localhost:3001', '_blank');
+            
+            // 显示完成消息
+            document.querySelector('.wizard-container').innerHTML = `
+                <div class="wizard-header">
+                    <h1>🎉 设置完成！</h1>
+                    <p>Open WebUI 已经为你准备就绪</p>
+                </div>
+                <div style="padding: 40px; text-align: center;">
+                    <div style="font-size: 4rem; margin-bottom: 20px;">🚀</div>
+                    <h2 style="color: #1f2937; margin-bottom: 20px;">欢迎使用 Open WebUI！</h2>
+                    <p style="color: #6b7280; font-size: 1.1rem; margin-bottom: 30px;">
+                        你的AI聊天界面已经在新标签页中打开。开始与AI对话吧！
+                    </p>
+                    <a href="http://localhost:3001" class="btn btn-primary" target="_blank">
+                        打开 Open WebUI
+                    </a>
+                </div>
+            `;
+        }
+
+        // 页面加载时的初始化
+        window.addEventListener('load', function() {
+            updateProgress();
+        });
+    </script>
+</body>
+</html>
