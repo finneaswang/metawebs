@@ -31,6 +31,7 @@ if __name__ == "__main__":
     print(f"🤖 模型配置: http://localhost:{port}/admin/model-config")
     print(f"📚 API文档: http://localhost:{port}/docs")
     print("🔑 默认管理员口令: admin123")
+    print("🌐 网站地址: https://metawebs.org")
     print("-" * 50)
     
     # Railway环境下不使用reload，本地开发时使用reload
