@@ -193,6 +193,116 @@ async def railway_openwebui_setup():
         return HTMLResponse(content=f.read())
 
 
+@app.get("/deploy-openwebui", response_class=HTMLResponse)
+async def deploy_integrated_openwebui_page():
+    """集成Open WebUI部署页面"""
+    return HTMLResponse(content=f"""
+    <!DOCTYPE html>
+    <html lang="zh-CN">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>部署Open WebUI到Railway</title>
+        <style>
+            * {{ margin: 0; padding: 0; box-sizing: border-box; }}
+            body {{ 
+                font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; 
+                background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); 
+                min-height: 100vh; 
+                display: flex; align-items: center; justify-content: center; 
+            }}
+            .container {{ 
+                background: white; border-radius: 20px; 
+                box-shadow: 0 20px 60px rgba(0,0,0,0.1); 
+                width: 90%; max-width: 800px; overflow: hidden; 
+            }}
+            .header {{ 
+                background: linear-gradient(135deg, #2563eb, #3b82f6); 
+                color: white; padding: 40px; text-align: center; 
+            }}
+            .header h1 {{ font-size: 2.5rem; margin-bottom: 10px; }}
+            .content {{ padding: 40px; }}
+            .step {{ 
+                background: #f8fafc; border: 1px solid #e2e8f0; 
+                border-radius: 12px; padding: 25px; margin: 20px 0; 
+            }}
+            .step h3 {{ color: #2563eb; margin-bottom: 15px; }}
+            .code {{ 
+                background: #1a1a1a; color: #00ff00; padding: 15px; 
+                border-radius: 8px; font-family: 'Courier New', monospace; 
+                margin: 10px 0; overflow-x: auto; 
+            }}
+            .button {{ 
+                display: inline-block; background: #2563eb; color: white; 
+                padding: 12px 24px; border-radius: 8px; text-decoration: none; 
+                margin: 10px 5px; transition: all 0.3s; 
+            }}
+            .button:hover {{ background: #1d4ed8; transform: translateY(-2px); }}
+            .success {{ 
+                background: #d1fae5; border: 1px solid #10b981; 
+                padding: 15px; border-radius: 8px; margin: 15px 0; color: #065f46; 
+            }}
+        </style>
+    </head>
+    <body>
+        <div class="container">
+            <div class="header">
+                <div style="font-size: 3em;">🚀</div>
+                <h1>部署Open WebUI</h1>
+                <p>使用集成的Open WebUI源码部署到Railway</p>
+            </div>
+            
+            <div class="content">
+                <div class="success">
+                    <strong>✅ Open WebUI源码已集成</strong><br>
+                    Open WebUI已经下载并集成到项目中，现在可以直接部署到Railway。
+                </div>
+
+                <div class="step">
+                    <h3>🎯 部署方法</h3>
+                    <p>运行以下命令来自动部署集成的Open WebUI：</p>
+                    <div class="code">python3 deploy_integrated_openwebui.py</div>
+                    <p>这个脚本会：</p>
+                    <ul style="margin-left: 20px; margin-top: 10px;">
+                        <li>✅ 配置Railway环境变量</li>
+                        <li>✅ 创建新的Railway项目</li>
+                        <li>✅ 自动部署Open WebUI</li>
+                        <li>✅ 分配域名</li>
+                    </ul>
+                </div>
+
+                <div class="step">
+                    <h3>📋 需要准备的信息</h3>
+                    <p>运行脚本前，请准备好：</p>
+                    <ul style="margin-left: 20px;">
+                        <li>🔑 OpenRouter API密钥 - <a href="https://openrouter.ai/keys" target="_blank">获取密钥</a></li>
+                        <li>🚂 Railway账号 - <a href="https://railway.app" target="_blank">注册Railway</a></li>
+                    </ul>
+                </div>
+
+                <div class="step">
+                    <h3>🔧 手动部署（可选）</h3>
+                    <p>如果自动脚本遇到问题，你也可以手动部署：</p>
+                    <ol style="margin-left: 20px;">
+                        <li>进入openwebui文件夹: <code>cd openwebui</code></li>
+                        <li>初始化git: <code>git init && git add . && git commit -m "Initial"</code></li>
+                        <li>登录Railway: <code>railway login</code></li>
+                        <li>创建项目: <code>railway init</code></li>
+                        <li>设置环境变量并部署: <code>railway up</code></li>
+                    </ol>
+                </div>
+
+                <div style="text-align: center; margin-top: 30px;">
+                    <a href="/" class="button">← 返回主页</a>
+                    <a href="https://railway.app/dashboard" target="_blank" class="button">🚂 Railway控制台</a>
+                </div>
+            </div>
+        </div>
+    </body>
+    </html>
+    """)
+
+
 @app.get("/admin", response_class=HTMLResponse)
 async def admin_interface():
     models_json = json.dumps(AVAILABLE_MODELS, ensure_ascii=False)

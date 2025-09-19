@@ -1,0 +1,29 @@
+{
+  "$schema": "https://railway.app/railway.schema.json",
+  "build": {
+    "builder": "DOCKERFILE",
+    "dockerfilePath": "openwebui/Dockerfile"
+  },
+  "deploy": {
+    "startCommand": "",
+    "healthcheckPath": "/health",
+    "healthcheckTimeout": 300,
+    "restartPolicyType": "ON_FAILURE",
+    "restartPolicyMaxRetries": 10
+  },
+  "variables": {
+    "OPENAI_API_BASE_URL": "https://openrouter.ai/api/v1",
+    "OPENAI_API_KEY": "",
+    "WEBUI_SECRET_KEY": "openwebui-railway-secret-2024",
+    "WEBUI_AUTH": "False",
+    "WEBUI_NAME": "Railway Open WebUI",
+    "PORT": "8080",
+    "HOST": "0.0.0.0",
+    "ENABLE_SIGNUP": "True",
+    "ENABLE_LOGIN_FORM": "True",
+    "ENABLE_OAUTH_SIGNUP": "False",
+    "WORKERS": "1",
+    "TIMEOUT": "120",
+    "LOG_LEVEL": "INFO"
+  }
+}
