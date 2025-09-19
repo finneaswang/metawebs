@@ -1,0 +1,33 @@
+请帮我创建一个完整的Railway部署解决方案，将Open WebUI部署到Railway平台。
+
+项目情况：
+- 项目路径：/Volumes/Additional/Metaweb/
+- Open WebUI完整源码已在：/Volumes/Additional/Metaweb/openwebui/
+- 需要部署到Railway平台
+- 使用OpenRouter API (https://openrouter.ai/api/v1)
+
+需要创建的文件：
+
+1. openwebui/railway.json - Railway配置文件
+2. deploy_to_railway.py - 自动部署脚本  
+3. RAILWAY_SIMPLE_GUIDE.md - 简单部署指南
+4. 修改app/main.py添加/railway-deploy路由
+
+要求：
+- 一键部署脚本，自动处理Railway CLI安装、登录、项目创建
+- 自动设置环境变量（OPENAI_API_BASE_URL, OPENAI_API_KEY等）
+- 使用Open WebUI原生Dockerfile
+- 生产环境配置（健康检查、重启策略）
+- 错误处理和用户友好的提示
+
+环境变量：
+OPENAI_API_BASE_URL=https://openrouter.ai/api/v1
+OPENAI_API_KEY=用户输入
+WEBUI_SECRET_KEY=随机生成
+WEBUI_AUTH=False  
+PORT=8080
+HOST=0.0.0.0
+
+目标：用户运行 python3 deploy_to_railway.py 就能完成整个部署。
+
+请直接提供完整的代码文件内容。

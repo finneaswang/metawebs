@@ -193,6 +193,80 @@ async def railway_openwebui_setup():
         return HTMLResponse(content=f.read())
 
 
+
+
+@app.get("/railway-deploy", response_class=HTMLResponse)
+async def railway_deploy_overview():
+    return HTMLResponse(content="""
+    <!DOCTYPE html>
+    <html lang="zh-CN">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Railway 一键部署向导</title>
+        <style>
+            body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; margin: 0; padding: 0; background: #0f172a; color: #f8fafc; }
+            .hero { max-width: 900px; margin: 0 auto; padding: 60px 20px 40px; text-align: center; }
+            .hero h1 { font-size: 2.8rem; margin-bottom: 10px; }
+            .hero p { opacity: 0.8; margin-bottom: 40px; }
+            .card-grid { display: grid; gap: 20px; max-width: 900px; margin: 0 auto 60px; padding: 0 20px 40px; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); }
+            .card { background: rgba(15, 23, 42, 0.9); border: 1px solid rgba(148, 163, 184, 0.1); border-radius: 16px; padding: 24px; text-align: left; position: relative; }
+            .card h3 { margin-top: 0; margin-bottom: 12px; color: #38bdf8; }
+            .card p { margin: 0 0 12px; opacity: 0.85; }
+            code { background: rgba(15, 23, 42, 0.8); border: 1px solid rgba(148, 163, 184, 0.3); border-radius: 8px; padding: 4px 8px; display: inline-block; color: #f97316; }
+            .button-group { text-align: center; margin-bottom: 40px; }
+            .button { display: inline-block; margin: 8px; padding: 12px 28px; border-radius: 999px; background: linear-gradient(135deg, #2563eb, #7c3aed); color: white; text-decoration: none; font-weight: 600; box-shadow: 0 10px 30px rgba(37, 99, 235, 0.35); transition: transform 0.2s ease, box-shadow 0.2s ease; }
+            .button.secondary { background: none; border: 1px solid rgba(148, 163, 184, 0.3); box-shadow: none; }
+            .button:hover { transform: translateY(-3px); box-shadow: 0 18px 38px rgba(124, 58, 237, 0.35); }
+            ul { margin: 0; padding-left: 18px; }
+            li { margin-bottom: 6px; }
+        </style>
+    </head>
+    <body>
+        <div class="hero">
+            <div style="font-size:60px; margin-bottom: 12px;">🚄</div>
+            <h1>Railway 一键部署 Open WebUI</h1>
+            <p>使用 <code>deploy_to_railway.py</code> 脚本和 <code>openwebui/railway.json</code> 配置即可完成全自动部署。</p>
+        </div>
+
+        <div class="card-grid">
+            <div class="card">
+                <h3>步骤 1 · 环境检查</h3>
+                <p>确保安装 Python ≥ 3.9，并已获取 OpenRouter API Key。</p>
+                <p>脚本会检测本地 Railway CLI，并在缺失时尝试自动安装。</p>
+            </div>
+            <div class="card">
+                <h3>步骤 2 · 运行脚本</h3>
+                <p>在仓库根目录执行：</p>
+                <code>python3 deploy_to_railway.py</code>
+                <p>按照提示完成 Railway 登录与项目创建。</p>
+            </div>
+            <div class="card">
+                <h3>步骤 3 · 配置变量</h3>
+                <p>脚本会写入关键环境变量：</p>
+                <ul>
+                    <li>OPENAI_API_BASE_URL</li>
+                    <li>OPENAI_API_KEY</li>
+                    <li>WEBUI_SECRET_KEY</li>
+                    <li>WEBUI_AUTH / PORT / HOST</li>
+                </ul>
+            </div>
+            <div class="card">
+                <h3>步骤 4 · 部署与访问</h3>
+                <p>Railway 将使用 Open WebUI 官方 Dockerfile 构建服务。</p>
+                <p>部署完成后，可在控制台查看日志，并通过生成的域名访问。</p>
+            </div>
+        </div>
+
+        <div class="button-group">
+            <a class="button" href="https://railway.app/dashboard" target="_blank">打开 Railway 控制台</a>
+            <a class="button secondary" href="/docs">查看 API 文档</a>
+            <a class="button secondary" href="/RAILWAY_SIMPLE_GUIDE.md">阅读部署指南</a>
+        </div>
+    </body>
+    </html>
+    """)
+
 @app.get("/deploy-openwebui", response_class=HTMLResponse)
 async def deploy_integrated_openwebui_page():
     """集成Open WebUI部署页面"""
