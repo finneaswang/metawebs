@@ -184,6 +184,15 @@ async def setup_guide():
         return HTMLResponse(content=f.read())
 
 
+@app.get("/railway-openwebui", response_class=HTMLResponse)
+async def railway_openwebui_setup():
+    """Railway Open WebUI 部署页面"""
+    import os
+    file_path = os.path.join(os.path.dirname(os.path.dirname(__file__)), "railway_openwebui_setup.html")
+    with open(file_path, "r", encoding="utf-8") as f:
+        return HTMLResponse(content=f.read())
+
+
 @app.get("/admin", response_class=HTMLResponse)
 async def admin_interface():
     models_json = json.dumps(AVAILABLE_MODELS, ensure_ascii=False)

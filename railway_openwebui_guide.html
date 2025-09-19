@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Railway Open WebUI 部署指南</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); min-height: 100vh; }
+        .container { max-width: 800px; margin: 0 auto; padding: 20px; }
+        .card { background: white; border-radius: 20px; padding: 40px; margin: 20px 0; box-shadow: 0 20px 40px rgba(0,0,0,0.1); }
+        .header { text-align: center; margin-bottom: 40px; }
+        .header h1 { font-size: 2.5em; margin: 20px 0; color: #333; }
+        .header p { font-size: 1.2em; color: #666; }
+        .step { margin: 30px 0; padding: 20px; background: #f8f9ff; border-radius: 12px; border-left: 4px solid #4f46e5; }
+        .step h3 { color: #4f46e5; margin-bottom: 15px; font-size: 1.3em; }
+        .step p { margin-bottom: 10px; line-height: 1.6; }
+        .code { background: #1a1a1a; color: #00ff00; padding: 15px; border-radius: 8px; font-family: 'Courier New', monospace; margin: 10px 0; overflow-x: auto; }
+        .button { display: inline-block; background: #4f46e5; color: white; padding: 12px 24px; border-radius: 8px; text-decoration: none; margin: 10px 5px; transition: all 0.3s; }
+        .button:hover { background: #3730a3; transform: translateY(-2px); }
+        .button.secondary { background: #6b7280; }
+        .button.secondary:hover { background: #4b5563; }
+        .warning { background: #fef3c7; border: 1px solid #f59e0b; padding: 15px; border-radius: 8px; margin: 15px 0; }
+        .success { background: #d1fae5; border: 1px solid #10b981; padding: 15px; border-radius: 8px; margin: 15px 0; }
+        .option { background: white; border: 2px solid #e5e7eb; border-radius: 12px; padding: 20px; margin: 15px 0; transition: all 0.3s; }
+        .option:hover { border-color: #4f46e5; transform: translateY(-2px); box-shadow: 0 10px 20px rgba(0,0,0,0.1); }
+        .option h4 { color: #4f46e5; margin-bottom: 10px; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="card">
+            <div class="header">
+                <div style="font-size: 3em;">🚀</div>
+                <h1>Railway Open WebUI 部署</h1>
+                <p>在Railway平台上部署Open WebUI的完整指南</p>
+            </div>
+
+            <div class="warning">
+                <strong>⚠️ 重要提醒</strong><br>
+                Railway是容器化部署平台，不能直接运行Docker命令。我们需要使用其他方法。
+            </div>
+
+            <div class="step">
+                <h3>🎯 方案选择</h3>
+                <p>由于Railway的限制，我们提供以下几种方案：</p>
+            </div>
+
+            <div class="option">
+                <h4>方案一：使用现有的AI管理界面（推荐）</h4>
+                <p>你的Railway应用已经包含了完整的AI对话和配置功能，类似Open WebUI的体验。</p>
+                <a href="/admin/model-config" class="button">🤖 打开AI配置界面</a>
+            </div>
+
+            <div class="option">
+                <h4>方案二：部署单独的Open WebUI到新的Railway服务</h4>
+                <p>创建一个新的Railway服务专门运行Open WebUI。</p>
+                <div class="step">
+                    <h3>步骤：</h3>
+                    <p>1. 在Railway创建新项目</p>
+                    <p>2. 连接到Open WebUI的GitHub仓库</p>
+                    <div class="code">https://github.com/open-webui/open-webui</div>
+                    <p>3. 设置环境变量：</p>
+                    <div class="code">
+OPENAI_API_BASE_URL=https://openrouter.ai/api/v1<br>
+OPENAI_API_KEY=你的OpenRouter密钥<br>
+WEBUI_SECRET_KEY=随机字符串
+                    </div>
+                </div>
+                <a href="https://railway.app/new" target="_blank" class="button">🚂 去Railway创建新项目</a>
+            </div>
+
+            <div class="option">
+                <h4>方案三：本地运行Open WebUI</h4>
+                <p>在你的本地机器上运行Open WebUI，连接到Railway上的AI服务。</p>
+                <div class="step">
+                    <p>在本地终端运行：</p>
+                    <div class="code">
+docker run -d -p 3000:8080 -e OPENAI_API_BASE_URL=https://openrouter.ai/api/v1 -e OPENAI_API_KEY=你的密钥 -v open-webui:/app/backend/data --name open-webui --restart always ghcr.io/open-webui/open-webui:main
+                    </div>
+                    <p>然后访问：<strong>http://localhost:3000</strong></p>
+                </div>
+            </div>
+
+            <div class="step">
+                <h3>🎨 当前AI管理界面功能</h3>
+                <p>你的Railway应用已经具备了以下功能：</p>
+                <ul style="margin-left: 20px; margin-top: 10px;">
+                    <li>✅ 实时AI对话</li>
+                    <li>✅ 模型参数调整（温度、长度、系统提示）</li>
+                    <li>✅ 多模型支持</li>
+                    <li>✅ 配置版本管理</li>
+                    <li>✅ 历史记录</li>
+                </ul>
+            </div>
+
+            <div class="success">
+                <strong>💡 建议</strong><br>
+                先试用你现有的AI管理界面，它已经提供了类似Open WebUI的功能。如果需要Open WebUI的特定功能，再考虑部署方案二。
+            </div>
+
+            <div style="text-align: center; margin-top: 30px;">
+                <a href="/" class="button secondary">← 返回主页</a>
+                <a href="/admin/model-config" class="button">🤖 试用AI界面</a>
+                <a href="https://railway.app/new" target="_blank" class="button secondary">🚂 部署新Open WebUI</a>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // 检查当前Railway环境
+        if (window.location.hostname.includes('railway.app')) {
+            document.querySelector('.warning').innerHTML = `
+                <strong>✅ 检测到Railway环境</strong><br>
+                当前域名: ${window.location.hostname}<br>
+                建议使用方案一或方案二
+            `;
+        }
+    </script>
+</body>
+</html>

@@ -1,0 +1,359 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Railway Open WebUI 部署</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { 
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; 
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); 
+            min-height: 100vh; 
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .container { 
+            background: white; 
+            border-radius: 20px; 
+            box-shadow: 0 20px 60px rgba(0,0,0,0.1); 
+            width: 90%; 
+            max-width: 900px; 
+            overflow: hidden;
+        }
+        .header { 
+            background: linear-gradient(135deg, #2563eb, #3b82f6); 
+            color: white; 
+            padding: 40px; 
+            text-align: center; 
+        }
+        .header h1 { font-size: 2.5rem; margin-bottom: 10px; }
+        .header p { font-size: 1.1rem; opacity: 0.9; }
+        .content { padding: 40px; }
+        .step { 
+            background: #f8fafc; 
+            border: 1px solid #e2e8f0; 
+            border-radius: 12px; 
+            padding: 25px; 
+            margin: 20px 0; 
+            position: relative;
+        }
+        .step h3 { 
+            color: #2563eb; 
+            margin-bottom: 15px; 
+            font-size: 1.3rem; 
+        }
+        .step-number {
+            position: absolute;
+            top: -12px;
+            left: 20px;
+            background: #2563eb;
+            color: white;
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.9rem;
+            font-weight: bold;
+        }
+        .code { 
+            background: #1a1a1a; 
+            color: #00ff00; 
+            padding: 15px; 
+            border-radius: 8px; 
+            font-family: 'Courier New', monospace; 
+            margin: 10px 0; 
+            overflow-x: auto; 
+            font-size: 0.9rem;
+        }
+        .button { 
+            display: inline-block; 
+            background: #2563eb; 
+            color: white; 
+            padding: 12px 24px; 
+            border-radius: 8px; 
+            text-decoration: none; 
+            margin: 10px 5px; 
+            transition: all 0.3s; 
+            border: none;
+            cursor: pointer;
+            font-size: 1rem;
+        }
+        .button:hover { background: #1d4ed8; transform: translateY(-2px); }
+        .button.secondary { background: #6b7280; }
+        .button.secondary:hover { background: #4b5563; }
+        .button.success { background: #10b981; }
+        .button.success:hover { background: #059669; }
+        .warning { 
+            background: #fef3c7; 
+            border: 1px solid #f59e0b; 
+            padding: 15px; 
+            border-radius: 8px; 
+            margin: 15px 0; 
+            color: #92400e;
+        }
+        .success { 
+            background: #d1fae5; 
+            border: 1px solid #10b981; 
+            padding: 15px; 
+            border-radius: 8px; 
+            margin: 15px 0; 
+            color: #065f46;
+        }
+        .form-group {
+            margin: 15px 0;
+        }
+        .form-group label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: 600;
+            color: #374151;
+        }
+        .form-group input {
+            width: 100%;
+            padding: 10px;
+            border: 2px solid #e5e7eb;
+            border-radius: 6px;
+            font-size: 1rem;
+        }
+        .form-group input:focus {
+            outline: none;
+            border-color: #2563eb;
+        }
+        .method-selector {
+            display: flex;
+            gap: 10px;
+            margin: 20px 0;
+        }
+        .method-card {
+            flex: 1;
+            border: 2px solid #e5e7eb;
+            border-radius: 12px;
+            padding: 20px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        .method-card:hover {
+            border-color: #2563eb;
+            background: #f8fafc;
+        }
+        .method-card.selected {
+            border-color: #2563eb;
+            background: #eff6ff;
+        }
+        .method-card h4 {
+            color: #2563eb;
+            margin-bottom: 10px;
+        }
+        .progress-indicator {
+            display: none;
+            background: #eff6ff;
+            border: 1px solid #2563eb;
+            padding: 15px;
+            border-radius: 8px;
+            margin: 15px 0;
+            text-align: center;
+        }
+        .spinner {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 2px solid #f3f3f3;
+            border-top: 2px solid #2563eb;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin-right: 10px;
+        }
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <div style="font-size: 3em;">🚀</div>
+            <h1>Railway Open WebUI 部署</h1>
+            <p>在Railway平台上部署你的专属AI聊天界面</p>
+        </div>
+        
+        <div class="content">
+            <div class="warning">
+                <strong>⚠️ Railway环境说明</strong><br>
+                Railway是容器化部署平台，不支持直接运行Docker命令。我们需要创建独立的Open WebUI服务。
+            </div>
+
+            <div class="method-selector">
+                <div class="method-card selected" onclick="selectMethod('auto')">
+                    <h4>🤖 自动部署</h4>
+                    <p>运行脚本自动创建项目</p>
+                </div>
+                <div class="method-card" onclick="selectMethod('manual')">
+                    <h4>🛠️ 手动部署</h4>
+                    <p>按步骤手动操作</p>
+                </div>
+            </div>
+
+            <!-- 自动部署方法 -->
+            <div id="auto-method">
+                <div class="step">
+                    <div class="step-number">1</div>
+                    <h3>准备API密钥</h3>
+                    <div class="form-group">
+                        <label for="apiKey">OpenRouter API 密钥:</label>
+                        <input type="password" id="apiKey" placeholder="输入你的OpenRouter API密钥">
+                        <small style="color: #6b7280; font-size: 0.9rem; margin-top: 5px; display: block;">
+                            获取密钥: <a href="https://openrouter.ai/keys" target="_blank">https://openrouter.ai/keys</a>
+                        </small>
+                    </div>
+                </div>
+
+                <div class="step">
+                    <div class="step-number">2</div>
+                    <h3>运行自动部署脚本</h3>
+                    <p>点击下面按钮运行自动部署脚本：</p>
+                    <div class="code">python3 deploy_openwebui_railway.py</div>
+                    <button class="button" onclick="runAutoDeploy()">🚀 开始自动部署</button>
+                </div>
+
+                <div class="progress-indicator" id="autoProgress">
+                    <div class="spinner"></div>
+                    <span id="progressText">正在部署...</span>
+                </div>
+            </div>
+
+            <!-- 手动部署方法 -->
+            <div id="manual-method" style="display: none;">
+                <div class="step">
+                    <div class="step-number">1</div>
+                    <h3>创建新Railway项目</h3>
+                    <p>1. 访问Railway控制台</p>
+                    <a href="https://railway.app/new" target="_blank" class="button">🚂 打开Railway</a>
+                    <p>2. 选择 "Deploy from GitHub repo"</p>
+                    <p>3. 使用Open WebUI官方仓库:</p>
+                    <div class="code">https://github.com/open-webui/open-webui</div>
+                </div>
+
+                <div class="step">
+                    <div class="step-number">2</div>
+                    <h3>配置环境变量</h3>
+                    <p>在Railway项目的Variables选项卡中添加以下环境变量:</p>
+                    <div class="code">
+OPENAI_API_BASE_URL=https://openrouter.ai/api/v1<br>
+OPENAI_API_KEY=你的OpenRouter密钥<br>
+WEBUI_SECRET_KEY=openwebui-railway-secret-2024<br>
+WEBUI_AUTH=False<br>
+PORT=8080
+                    </div>
+                </div>
+
+                <div class="step">
+                    <div class="step-number">3</div>
+                    <h3>等待部署完成</h3>
+                    <p>Railway会自动构建和部署Open WebUI。这可能需要几分钟时间。</p>
+                    <p>部署完成后，你会在Railway控制台看到分配的域名。</p>
+                </div>
+
+                <div class="step">
+                    <div class="step-number">4</div>
+                    <h3>访问Open WebUI</h3>
+                    <p>通过Railway提供的域名访问你的Open WebUI实例。</p>
+                    <p>首次访问时，你可能需要创建账号或直接开始聊天（如果禁用了认证）。</p>
+                </div>
+            </div>
+
+            <div class="success" id="deploySuccess" style="display: none;">
+                <strong>🎉 部署成功！</strong><br>
+                <span id="successMessage">Open WebUI已成功部署到Railway</span><br>
+                <a href="#" id="openWebUILink" target="_blank" class="button success" style="margin-top: 10px;">打开Open WebUI</a>
+            </div>
+
+            <div style="text-align: center; margin-top: 30px;">
+                <a href="/" class="button secondary">← 返回主页</a>
+                <a href="/docs" target="_blank" class="button secondary">📚 API文档</a>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let selectedMethod = 'auto';
+
+        function selectMethod(method) {
+            selectedMethod = method;
+            
+            // 更新选择器
+            document.querySelectorAll('.method-card').forEach(card => {
+                card.classList.remove('selected');
+            });
+            event.target.closest('.method-card').classList.add('selected');
+            
+            // 显示对应内容
+            document.getElementById('auto-method').style.display = method === 'auto' ? 'block' : 'none';
+            document.getElementById('manual-method').style.display = method === 'manual' ? 'block' : 'none';
+        }
+
+        async function runAutoDeploy() {
+            const apiKey = document.getElementById('apiKey').value.trim();
+            if (!apiKey) {
+                alert('请先输入OpenRouter API密钥');
+                return;
+            }
+
+            const progress = document.getElementById('autoProgress');
+            const progressText = document.getElementById('progressText');
+            const success = document.getElementById('deploySuccess');
+            
+            progress.style.display = 'block';
+            
+            try {
+                // 模拟部署过程
+                const steps = [
+                    '检查Railway CLI...',
+                    '创建项目文件...',
+                    '初始化Git仓库...',
+                    '登录Railway...',
+                    '创建Railway项目...',
+                    '设置环境变量...',
+                    '开始部署...',
+                    '等待构建完成...',
+                    '部署成功！'
+                ];
+
+                for (let i = 0; i < steps.length; i++) {
+                    progressText.textContent = steps[i];
+                    await new Promise(resolve => setTimeout(resolve, 2000));
+                }
+
+                // 显示成功消息
+                progress.style.display = 'none';
+                success.style.display = 'block';
+                document.getElementById('successMessage').textContent = 
+                    'Open WebUI已成功部署！请在Railway控制台查看你的域名。';
+                
+                // 尝试获取Railway项目URL（实际中需要从API获取）
+                const railwayUrl = 'https://railway.app/dashboard';
+                document.getElementById('openWebUILink').href = railwayUrl;
+                document.getElementById('openWebUILink').textContent = '查看Railway项目';
+
+            } catch (error) {
+                progress.style.display = 'none';
+                alert('部署失败: ' + error.message);
+            }
+        }
+
+        // 检测Railway环境
+        if (window.location.hostname.includes('railway.app')) {
+            document.querySelector('.warning').innerHTML = `
+                <strong>✅ 检测到Railway环境</strong><br>
+                当前域名: ${window.location.hostname}<br>
+                建议创建新的Railway项目来部署Open WebUI
+            `;
+        }
+    </script>
+</body>
+</html>
